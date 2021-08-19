@@ -1,0 +1,67 @@
+SYSTEM = U3S5
+
+## --- Simulation precision ---
+PREC = Accurate
+ENCUT = 520
+EDIFF = 1e-7
+#EDIFFG = -1e-2
+LREAL = .FALSE. #Auto
+ISYM = -1
+
+## --- vdW correction ---
+IVDW = 12
+
+## --- k-points ---
+KSPACING = 0.5
+KGAMMA = .TRUE.
+
+## --- SCF setup ---
+ALGO = N #Fast
+TIME = 0.2
+NELM = 600
+NELMIN = 5
+NELMDL = -15
+ISMEAR = -5
+SIGMA = 0.001
+
+## --- magnetic moment ---
+MAGMOM = 60*0  0 0 4  0 0 4  0 0 4  0 0 4  0 0 4  0 0 4  0 0 4  0 0 4  0 0 3.5  0 0 3.5  0 0 3.5  0 0 3.5
+#ISPIN = 2
+VOSKOWN = 1
+SAXIS = 0 0 1
+
+## -- spin-orbit coupling --
+LNONCOLLINEAR = .TRUE.
+LSORBIT = .TRUE.
+GGA_COMPAT = .FALSE.
+LSUBROT = .TRUE.
+LMAXMIX = 6
+
+## --- Parallelization ---
+LPLANE = .FALSE.
+NCORE = 12
+NSIM = 8
+
+## --- Geometry optimization ---
+IBRION = 2
+ISIF = 3
+NSW = 10000
+POTIM = 0.2
+NFREE = 4
+ADDGRID = .TRUE.
+
+## --- Mixing parameters ---
+AMIX = 0.1
+BMIX = 0.00001
+AMIX_MAG = 0.8
+BMIX_MAG = 0.00001
+MAXMIX = 30
+
+## --- Write output ---
+NWRITE = 0
+LWAVE = F
+LCHARG = F
+LVTOT = F
+LORBIT = 11
+LORBMOM = .TRUE.
+LAECHG=.TRUE.
