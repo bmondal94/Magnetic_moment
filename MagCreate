@@ -1,0 +1,62 @@
+#!/bin/bash
+
+if [[ $# -eq 0 ]] ;then
+echo " " 
+echo "This script is to collect MAGMOM from  VASP INCAR and OUTCAR file
+
+Syntax:  $(basename "$0") <path-to-OUTCAR>
+
+<path-to-OUTCAR>	:	Write '.' for current directory. 
+"
+echo " "
+exit 0
+fi
+
+
+printf "\nDirectory = $1\n"
+currentdir=$(pwd)
+cd $1
+
+awk '/mag/ {print $10,$11,$12}' OSZICAR > MAGMOM.dat
+grep "^MAGMOM" INCAR >> MAGMOM.dat
+
+NIONS=$(awk '/NIONS/ {print $NF}' OUTCAR)
+NBANDS=$(awk '/NBANDS=/ {print $NF}' OUTCAR) 
+LNONCOLLINEAR=$(awk '/LNONCOLLINEAR/ {print $3}' OUTCAR)
+
+A=($(grep -n "magnetization (x)" OUTCAR |cut -d: -f1))
+
+echo "* ${#A[@]} magnetization data will be written."
+
+if [[ "${LNONCOLLINEAR}" =~ 'T' ]]; then
+	printf "\n* Magnetizations are from non-collinear calculation.\n\n"
+	B=($(grep -n "magnetization (y)" OUTCAR |cut -d: -f1))
+	C=($(grep -n "magnetization (z)" OUTCAR |cut -d: -f1))
+else
+	printf "\n* Magnetization axis is by default put along Z-axis.\n"
+	printf "* If your SAXIS is not along Z-axis then these MAGMOM data are wrong.\n\n"
+
+fi
+printf "\n* Progress bar:\n"
+for I in ${!A[@]}; do
+	printf "$I "
+	a=${A[I]} 
+	magmomx=($(sed -n "$((a+4)),$((a+3+NIONS))p;$((a+4+NIONS))q" OUTCAR | awk '{print $NF}'))
+	
+	if [[ "${LNONCOLLINEAR}" =~ 'T' ]]; then	
+		b=${B[I]}; c=${C[I]}
+		magmomy=($(sed -n "$((b+4)),$((b+3+NIONS))p;$((b+4+NIONS))q" OUTCAR | awk '{print $NF}'))
+		magmomz=($(sed -n "$((c+4)),$((c+3+NIONS))p;$((c+4+NIONS))q" OUTCAR | awk '{print $NF}'))
+	else
+		for i in "${magmomx[@]}"; do magmomy+=(0); magmomz+=(0);done
+	fi
+	
+	array=("MAGMOM = ")
+	for mm in ${!magmomx[*]};do
+		array+="${magmomx[mm]} ${magmomy[mm]} ${magmomz[mm]} "
+	done
+	
+	echo $array>>MAGMOM.dat
+done
+
+cd $currentdir
